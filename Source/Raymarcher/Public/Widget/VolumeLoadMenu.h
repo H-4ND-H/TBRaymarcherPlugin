@@ -22,10 +22,13 @@ DECLARE_LOG_CATEGORY_EXTERN(VolumeLoadMenu, All, All)
 /**
  * A menu that lets a user load new MHD files into a RaymarchVolume
  */
-UCLASS()
-class RAYMARCHER_API UVolumeLoadMenu : public UUserWidget
+	UCLASS()
+	class RAYMARCHER_API UVolumeLoadMenu : public UUserWidget
 {
 	GENERATED_BODY()
+
+private:
+	static UVolumeLoadMenu* _instance;
 
 public:
 	/// Override initialize to bind button functions.
@@ -33,46 +36,51 @@ public:
 
 	///  Button that will let user load a new MHD file in normalized G16.
 	UPROPERTY(meta = (BindWidget))
-	UButton* LoadG16Button;
+		UButton* LoadG16Button;
 
 	///  Button that will let user load a new MHD file in F32 format
 	UPROPERTY(meta = (BindWidget))
-	UButton* LoadF32Button;
+		UButton* LoadF32Button;
 
 	/// Combobox for selecting loaded MHD Assets.
 	UPROPERTY(meta = (BindWidget))
-	UComboBoxString* AssetSelectionComboBox;
+		UComboBoxString* AssetSelectionComboBox;
 
 	/// Array of existing MHD Assets that can be set immediately. Will populate the AssetSelection combo box.
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	TArray<UVolumeAsset*> AssetArray;
+		TArray<UVolumeAsset*> AssetArray;
 
 	/// Called when LoadG16Button is clicked.
 	UFUNCTION()
-	void OnLoadNormalizedClicked();
+		void OnLoadNormalizedClicked();
 
 	/// Called when LoadF32Button is clicked.
 	UFUNCTION()
-	void OnLoadF32Clicked();
+		void OnLoadF32Clicked();
 
 	/// Unified function for loading F32 or normalized.
 	UFUNCTION()
-	void PerformLoad(bool bNormalized);
+		void PerformLoad(bool bNormalized);
+
+	UFUNCTION()
+		void PerformLoadFromPath(bool bNormalized, const FString& path);
 
 	/// Called when AssetSelectionComboBox has a new value selected.
 	UFUNCTION()
-	void OnAssetSelected(FString AssetName, ESelectInfo::Type SelectType);
+		void OnAssetSelected(FString AssetName, ESelectInfo::Type SelectType);
 
 	/// The volume this menu is affecting.
 	/// #TODO do not touch the volume directly and expose delegates instead?
 	UPROPERTY(EditAnywhere)
-	TArray<ARaymarchVolume*> ListenerVolumes;
+		TArray<ARaymarchVolume*> ListenerVolumes;
 
 	/// Sets a new volume to be affected by this menu.
 	UFUNCTION(BlueprintCallable)
-	void AddListenerVolume(ARaymarchVolume* NewRaymarchVolume);
+		void AddListenerVolume(ARaymarchVolume* NewRaymarchVolume);
 
 	/// Sets a new volume to be affected by this menu.
 	UFUNCTION(BlueprintCallable)
-	void RemoveListenerVolume(ARaymarchVolume* RemovedRaymarchVolume);
+		void RemoveListenerVolume(ARaymarchVolume* RemovedRaymarchVolume);
+
+	static UVolumeLoadMenu* getInstance();
 };

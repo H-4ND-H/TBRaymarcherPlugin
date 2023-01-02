@@ -9,6 +9,8 @@
 
 DEFINE_LOG_CATEGORY(VolumeLoadMenu)
 
+UVolumeLoadMenu* UVolumeLoadMenu::_instance;
+
 bool UVolumeLoadMenu::Initialize()
 {
 	Super::Initialize();
@@ -38,6 +40,7 @@ bool UVolumeLoadMenu::Initialize()
 		AssetSelectionComboBox->OnSelectionChanged.AddDynamic(this, &UVolumeLoadMenu::OnAssetSelected);
 	}
 
+	_instance = this;
 	return true;
 }
 
@@ -56,6 +59,32 @@ void UVolumeLoadMenu::PerformLoad(bool bNormalized)
 	if (ListenerVolumes.Num() > 0)
 	{
 		UVolumeAsset* OutAsset = UVolumeTextureToolkitBPLibrary::LoadVolumeFromFileDialog(bNormalized);
+
+		if (OutAsset)
+		{
+			// Add the asset to list of already loaded assets and select it through the combobox. This will call
+			// OnAssetSelected().
+			AssetArray.Add(OutAsset);
+			AssetSelectionComboBox->AddOption(GetNameSafe(OutAsset));
+			AssetSelectionComboBox->SetSelectedOption(GetNameSafe(OutAsset));
+		}
+		else
+		{
+			UE_LOG(VolumeLoadMenu, Error, TEXT("Loading Volume From file dialog failed"));
+		}
+	}
+	else
+	{
+		UE_LOG(
+			VolumeLoadMenu, Error, TEXT("Attempted to load Volume file with no Raymarched Volume associated with menu."));
+	}
+}
+
+void UVolumeLoadMenu::PerformLoadFromPath(bool bNormalized, const FString& path)
+{
+	if (ListenerVolumes.Num() > 0)
+	{
+		UVolumeAsset* OutAsset = UVolumeTextureToolkitBPLibrary::LoadVolumeFromPath(bNormalized, path);
 
 		if (OutAsset)
 		{
@@ -103,6 +132,11 @@ void UVolumeLoadMenu::OnAssetSelected(FString AssetName, ESelectInfo::Type Selec
 void UVolumeLoadMenu::RemoveListenerVolume(ARaymarchVolume* RemovedRaymarchVolume)
 {
 	ListenerVolumes.Remove(RemovedRaymarchVolume);
+}
+
+UVolumeLoadMenu* UVolumeLoadMenu::getInstance()
+{
+	return _instance;
 }
 
 void UVolumeLoadMenu::AddListenerVolume(ARaymarchVolume* NewRaymarchVolume)

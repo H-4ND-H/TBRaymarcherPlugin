@@ -69,3 +69,36 @@ UVolumeAsset* UVolumeTextureToolkitBPLibrary::LoadVolumeFromFileDialog(const boo
 	}
 	return nullptr;
 }
+
+UVolumeAsset* UVolumeTextureToolkitBPLibrary::LoadVolumeFromPath(const bool& bNormalize, const FString& path)
+{
+
+	FString FileName = path;
+	IVolumeLoader* Loader = nullptr;
+	if (FileName.EndsWith(".mhd"))
+	{
+		Loader = UMHDLoader::Get();
+	}
+	else
+	{
+		Loader = UDICOMLoader::Get();
+	}
+	UVolumeAsset* OutAsset = Loader->CreateVolumeFromFile(FileName, bNormalize, !bNormalize);
+
+	if (OutAsset)
+	{
+		UE_LOG(LogTemp, Display,
+			TEXT("Creating Volume asset from filename %s succeeded, seting Volume asset into associated listener volumes."),
+			*FileName);
+
+		// Add the asset to list of already loaded assets and select it through the combobox. This will call
+		// OnAssetSelected().
+		return OutAsset;
+	}
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("Creating Volume asset from filename %s failed."), *FileName);
+	}
+
+	return nullptr;
+}

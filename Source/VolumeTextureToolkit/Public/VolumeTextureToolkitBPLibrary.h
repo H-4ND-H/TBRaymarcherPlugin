@@ -27,4 +27,7 @@ public:
 	 * IVolumeLoader.*/
 	UFUNCTION(BlueprintCallable, meta = (Keywords = "Load Volume DICOM MHD"), Category = "VolumeTextureToolkit")
 	static UVolumeAsset* LoadVolumeFromFileDialog(const bool& bNormalize);
+
+	UFUNCTION(BlueprintCallable, meta = (Keywords = "Load Volume DICOM MHD"), Category = "VolumeTextureToolkit")
+	static UVolumeAsset* LoadVolumeFromPath(const bool& bNormalize, const FString& path);
 };
